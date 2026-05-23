@@ -1,6 +1,6 @@
 # AI-Assisted Bacterial Genome Mining Pipeline
 
-This folder contains reusable template files for bacterial genome mining from an assembled bacterial genome FASTA file. It follows the same project setup method as the bacterial genome analysis pipeline: template files stay in `00_Pipeline_Templates`, and each analysis project lives in `09_Projects`.
+This repository contains reusable template files for bacterial genome mining from assembled bacterial genome FASTA files.
 
 ## Active Workflow
 
