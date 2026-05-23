@@ -1,0 +1,10 @@
+name: CortexAI
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python
+  - quast
+  - bakta
+  - antismash
+  - gecco

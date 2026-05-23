@@ -1,0 +1,24 @@
+# Local sample-specific config
+config.env
+
+# Local/generated outputs if they appear in the template folder accidentally
+01_Genome_FASTA/
+02_QUAST_QC/*
+03_Bakta_Annotation/*
+04_AntiSMASH_BGC/*
+05_GECCO_ML/*
+06_Combined_Results/*
+07_Final_Report/*
+08_Notes/*
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+
+# Conda / Python / system files
+.env/
+.venv/
+__pycache__/
+.DS_Store
+Thumbs.db
