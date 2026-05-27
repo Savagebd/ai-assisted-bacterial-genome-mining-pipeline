@@ -3,6 +3,9 @@ config.env
 
 # Local/generated outputs if they appear in the template folder accidentally
 01_Genome_FASTA/
+*.fasta
+*.fa
+*.fna
 02_QUAST_QC/*
 03_Bakta_Annotation/*
 04_AntiSMASH_BGC/*
@@ -15,10 +18,14 @@ config.env
 *.log
 *.tmp
 *.temp
+bakta_db/
+databases/
+.bakta/
 
 # Conda / Python / system files
 .env/
 .venv/
 __pycache__/
+*.pyc
 .DS_Store
 Thumbs.db

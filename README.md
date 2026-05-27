@@ -1,17 +1,72 @@
 # AI-Assisted Bacterial Genome Mining Pipeline
 
-This repository contains reusable template files for bacterial genome mining from assembled bacterial genome FASTA files.
+Reusable genome mining workflow for assembled bacterial genomes using QUAST, Bakta, antiSMASH, GECCO, and candidate biosynthetic gene cluster reporting.
 
-## Active Workflow
+This repository is part of a bioinformatics portfolio by Raihanul Islam (`Savagebd`). It is designed as a practical, reproducible template for bacterial genome mining projects that begin with an assembled genome FASTA file.
+This repository is part of a bioinformatics portfolio by Raihanul Islam (`Savagebd`). It is designed as a practical template for bacterial genome mining projects that begin with an assembled genome FASTA file.
 
-1. Input FASTA validation
-2. SAMPLE_ID safety validation
-3. QUAST assembly/genome quality control
-4. Bakta genome annotation
-5. antiSMASH biosynthetic gene cluster detection
-6. GECCO machine-learning BGC prediction
-7. Combined antiSMASH and GECCO BGC summary table
-8. Final genome mining interpretation report
+## What This Pipeline Does
+
+The pipeline starts from an assembled bacterial genome FASTA file and runs a genome mining workflow:
+
+```text
+Assembled bacterial genome FASTA
+-> QUAST assembly QC
+-> Bakta genome annotation
+-> antiSMASH BGC detection
+-> GECCO machine-learning BGC prediction
+-> combined BGC summary
+-> final genome mining report
+```
+
+The pipeline prioritizes predicted candidate biosynthetic gene clusters. It does not prove compound production or biological activity.
+
+## Input Requirements
+
+This pipeline requires an assembled bacterial genome FASTA file, not raw FASTQ reads.
+
+Place the input FASTA inside:
+
+```text
+01_Genome_FASTA/
+```
+
+Accepted extensions:
+
+```text
+.fna
+.fa
+.fasta
+```
+
+The `GENOME_FASTA` path in `config.env` must point to a file inside `PROJECT_DIR/01_Genome_FASTA`.
+
+## Workflow Overview
+
+1. Validate `config.env`, `SAMPLE_ID`, and FASTA input location.
+2. Run QUAST for assembly/genome quality statistics.
+3. Run Bakta for genome annotation.
+4. Run antiSMASH for rule-based biosynthetic gene cluster detection.
+5. Run GECCO for machine-learning-supported BGC prediction.
+6. Combine antiSMASH and GECCO evidence into summary tables.
+7. Generate a final genome mining interpretation report.
+
+## Folder Structure
+
+The project uses this numbered folder layout:
+
+```text
+01_Genome_FASTA
+02_QUAST_QC
+03_Bakta_Annotation
+04_AntiSMASH_BGC
+05_GECCO_ML
+06_Combined_Results
+07_Final_Report
+08_Notes
+```
+
+Only `01_Genome_FASTA` needs to be created manually before running the pipeline. Downstream output folders are created automatically.
 
 ## Template Files
 
@@ -24,44 +79,30 @@ PIPELINE_EXPLANATION.md
 .gitignore
 ```
 
-The template folder should not contain numbered workflow folders. Those folders belong inside each analysis project.
+The reusable template folder should not contain numbered workflow outputs. Those folders belong inside each analysis project.
 
-## Step 1: Create a New Project Folder
+## Environment Setup
 
-```bash
-mkdir -p ~/Bioinformatics/09_Projects/Your_Project_Name
-cd ~/Bioinformatics/09_Projects/Your_Project_Name
-```
-
-## Step 2: Create Only the Input Folder
+Create the Conda environment:
 
 ```bash
-mkdir -p 01_Genome_FASTA
+conda env create -f environment.yml
 ```
 
-The user only creates `01_Genome_FASTA` manually because the FASTA must be placed there before validation. The pipeline automatically creates the remaining output folders during the run.
-
-## Step 3: Place the FASTA File
-
-Place the assembled bacterial genome FASTA file inside:
-
-```text
-01_Genome_FASTA/
-```
-
-Accepted extensions are `.fna`, `.fa`, and `.fasta`.
-
-## Step 4: Copy Reusable Template Files
+Activate it:
 
 ```bash
-cp ~/Bioinformatics/00_Pipeline_Templates/ai_genome_mining_pipeline/run_pipeline.sh .
-cp ~/Bioinformatics/00_Pipeline_Templates/ai_genome_mining_pipeline/config.example.env ./config.env
-cp ~/Bioinformatics/00_Pipeline_Templates/ai_genome_mining_pipeline/environment.yml .
+conda activate CortexAI
 ```
 
-## Step 5: Edit config.env
+The pipeline does not create or modify Conda environments automatically.
+
+## Configuration
+
+Copy the public example configuration into a private local config file:
 
 ```bash
+cp config.example.env config.env
 nano config.env
 ```
 
@@ -85,57 +126,18 @@ THREADS="4"
 BAKTA_DB="$HOME/Bioinformatics/06_Tools/bakta_db/db-light"
 ```
 
-`GENOME_FASTA` must point to the project-local FASTA file inside `01_Genome_FASTA/`.
+`config.example.env` is safe to commit. `config.env` is local, sample-specific, and ignored by Git.
 
-`SAMPLE_ID` may only contain letters, numbers, underscores, and hyphens.
+## How to Run
 
-## Step 6: Activate Conda
-
-```bash
-conda activate CortexAI
-```
-
-## Step 7: Run the Pipeline
+From the project folder:
 
 ```bash
+chmod +x run_pipeline.sh
 ./run_pipeline.sh
 ```
 
-## Output Folders Created Automatically
-
-`run_pipeline.sh` automatically creates or replaces these generated output folders:
-
-```text
-02_QUAST_QC
-03_Bakta_Annotation
-04_AntiSMASH_BGC
-05_GECCO_ML
-06_Combined_Results
-07_Final_Report
-08_Notes
-```
-
-The script protects `01_Genome_FASTA` and does not delete or modify the original input FASTA.
-
-## Final Project Folder Structure
-
-```text
-01_Genome_FASTA
-02_QUAST_QC
-03_Bakta_Annotation
-04_AntiSMASH_BGC
-05_GECCO_ML
-06_Combined_Results
-07_Final_Report
-08_Notes
-run_pipeline.sh
-config.env
-environment.yml
-```
-
-`run_pipeline.sh` uses the existing project-local FASTA directly. It does not copy input data from a central raw data folder.
-
-## Important Outputs
+## Output Explanation
 
 QUAST assembly/genome quality report:
 
@@ -162,47 +164,74 @@ GECCO machine-learning BGC predictions:
 05_GECCO_ML/
 ```
 
-Combined antiSMASH and GECCO summary:
+Combined BGC summary:
 
 ```text
 06_Combined_Results/combined_bgc_summary.tsv
 06_Combined_Results/combined_bgc_summary.txt
 ```
 
-Final reports:
+Final genome mining reports:
 
 ```text
 07_Final_Report/genome_mining_summary.txt
 07_Final_Report/genome_mining_interpretation_report.txt
 ```
 
-Pipeline log:
+Logs:
 
 ```text
 08_Notes/logs/
 ```
 
-## Environment Recreation
+## Interpretation Notes
 
-The required Conda environment can be recreated with:
+antiSMASH and GECCO provide complementary evidence:
 
-```bash
-conda env create -f environment.yml
-conda activate CortexAI
-```
+- antiSMASH uses curated rules and known biosynthetic gene cluster models.
+- GECCO uses machine-learning-supported prediction of candidate BGC regions.
 
-`environment.yml` is only for recreating the environment. The pipeline does not create or modify Conda environments automatically.
+Candidate regions supported by one or both tools are useful for manual review, literature comparison, and future prioritization. They are predictions, not experimental confirmation.
 
-## Safety Notes
+## Safety Design
 
-The pipeline does not delete or modify files inside `01_Genome_FASTA`.
+The pipeline includes basic safety checks:
 
-Generated output folders may be replaced during reruns.
+- `SAMPLE_ID` is validated before use in output names.
+- `GENOME_FASTA` must resolve inside `PROJECT_DIR/01_Genome_FASTA`.
+- Input FASTA files are not deleted during reruns.
+- Rerun cleanup only removes generated output folders.
+- Path traversal patterns are rejected for the input FASTA.
 
-Always check `config.env` carefully before running the pipeline.
+Always inspect `config.env` before running the workflow.
+
+## Limitations
+
+- This pipeline starts from assembled bacterial genome FASTA files.
+- It does not process raw FASTQ reads.
+- Predicted BGCs are candidate regions, not proof of metabolite production.
+- antiSMASH and GECCO evidence supports prioritization, not experimental confirmation.
+- The workflow does not prove biological activity, pathogenicity, or clinical relevance.
+- DeepBGC is not part of the active workflow; it could be explored later as a separate future module or project.
+
+## Future Improvements
+
+Possible future additions include:
+
+- richer BGC classification summaries
+- BiG-SCAPE/CORASON-style comparative BGC analysis
+- MIBiG similarity interpretation
+- metabolite-family prioritization tables
+- optional DeepBGC exploration as a separate module
+- better HTML or Markdown final reporting
+- comparative genome mining across multiple bacterial genomes
+
+## Portfolio / Faculty Value
+
+This project demonstrates genome mining from assembled bacterial genomes, practical use of annotation and BGC prediction tools, safe project organization, reproducible configuration, and careful candidate-level interpretation. It fits between a foundational bacterial genome analysis pipeline and more advanced comparative or organism-specific genome mining workflows.
 
 ## Author
 
-Created by Raihanul Islam (Savagebd) as part of a bioinformatics learning and portfolio development project.
+Created by Raihanul Islam (`Savagebd`) as part of a bioinformatics learning and portfolio development project.
 
 This repository is shared publicly for transparency, portfolio development, and learning purposes. Direct copying and submitting this project as someone else's original coursework is not permitted.

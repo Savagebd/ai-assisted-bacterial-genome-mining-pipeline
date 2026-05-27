@@ -1,189 +1,85 @@
 # AI-Assisted Genome Mining Pipeline Explanation
 
-## Project Setup Method
+## Project Goal
 
-This pipeline follows the same reusable project-folder method as the bacterial genome analysis pipeline.
+This project provides a reusable genome mining workflow for assembled bacterial genomes. It combines assembly quality review, genome annotation, biosynthetic gene cluster prediction, candidate summary tables, and a final interpretation report.
 
-Template files stay in:
+The goal is not to prove that a bacterium produces a compound. The goal is to organize computational evidence so candidate biosynthetic gene clusters can be reviewed more systematically.
 
-```text
-~/Bioinformatics/00_Pipeline_Templates/ai_genome_mining_pipeline/
-```
+## Why Start From an Assembled Genome FASTA?
 
-Each analysis project lives in:
+Genome mining tools such as antiSMASH and GECCO work on assembled genome sequences. Raw FASTQ reads must first be assembled in a separate genome analysis workflow.
 
-```text
-~/Bioinformatics/09_Projects/
-```
-
-For each new project, the user creates a project folder, creates only the `01_Genome_FASTA` input folder, places the assembled genome FASTA inside that folder, copies the reusable template files into the project, edits `config.env`, activates Conda, and runs:
-
-```bash
-./run_pipeline.sh
-```
-
-The template folder stays clean and does not contain numbered workflow folders.
-
-## Project-Local Input and Output
-
-This pipeline does not use a central raw data folder.
-
-`01_Genome_FASTA` is the only required manually created workflow folder because the FASTA file must be placed there before the pipeline validates the input.
-
-The input FASTA is stored inside the analysis project:
+This pipeline expects one assembled bacterial genome FASTA inside:
 
 ```text
 01_Genome_FASTA/
 ```
 
-All downstream output folders are generated automatically by `run_pipeline.sh`:
+The script validates that the FASTA is inside the project folder before running downstream tools.
 
-```text
-02_QUAST_QC/
-03_Bakta_Annotation/
-04_AntiSMASH_BGC/
-05_GECCO_ML/
-06_Combined_Results/
-07_Final_Report/
-08_Notes/
-```
+## What Are Biosynthetic Gene Clusters?
 
-The script protects `01_Genome_FASTA` and does not delete or modify the original input FASTA. Generated output folders may be replaced during reruns.
+Biosynthetic gene clusters, or BGCs, are groups of genes that may work together to produce specialized metabolites. In bacteria, these regions can be associated with compounds such as antibiotics, siderophores, toxins, pigments, or signaling molecules.
 
-The `config.env` file makes each project reusable by storing the project path, sample name, FASTA path, thread count, and Bakta database path.
+A predicted BGC is a candidate region. It is not proof that a compound is produced under laboratory or natural conditions.
 
-## Active Workflow
+## Tool Logic
 
-The active workflow has eight steps:
+### QUAST
 
-1. Input FASTA validation
-2. SAMPLE_ID safety validation
-3. QUAST assembly/genome quality control
-4. Bakta genome annotation
-5. antiSMASH biosynthetic gene cluster detection
-6. GECCO machine-learning BGC prediction
-7. Combined antiSMASH and GECCO BGC summary table
-8. Final genome mining interpretation report
+QUAST evaluates the assembled genome before mining. Assembly quality matters because fragmented genomes can split BGCs across contigs or cause regions to be missed.
 
-## Step 1: Input FASTA Validation
+### Bakta
 
-The pipeline checks that the configured genome FASTA file:
+Bakta annotates genes and functional features in the bacterial genome. These annotations provide useful biological context around predicted BGC regions.
 
-- Exists as a file
-- Is inside `PROJECT_DIR/01_Genome_FASTA`
-- Uses `.fna`, `.fa`, or `.fasta`
-- Does not use path traversal such as `../`
+### antiSMASH
 
-This protects the project-local input layout and prevents accidental use of files outside the project folder.
+antiSMASH detects BGCs using curated rules and known biosynthetic gene cluster models. It is especially useful for recognizable BGC classes and produces detailed reports for manual inspection.
 
-## Step 2: SAMPLE_ID Safety Validation
+### GECCO
 
-The pipeline validates `SAMPLE_ID` before using it in output paths and file names.
+GECCO predicts BGCs using machine-learning-supported sequence patterns. It can provide evidence that complements antiSMASH because it uses a different prediction strategy.
 
-Allowed characters are:
+GECCO results are still computational predictions. They should be treated as candidate evidence, not experimental proof.
 
-```text
-letters, numbers, underscores, hyphens
-```
+## Why Use Both antiSMASH and GECCO?
 
-This prevents unsafe sample names with spaces, slashes, or path traversal patterns.
+antiSMASH and GECCO provide complementary views:
 
-## Step 3: QUAST Assembly/Genome Quality Control
+- antiSMASH is rule-based and knowledge-driven.
+- GECCO is machine-learning-supported and pattern-based.
 
-QUAST evaluates the quality of the assembled genome before genome mining. It reports assembly statistics such as total length, contig count, N50, L50, GC content, and related metrics.
+Candidate regions supported by both tools may deserve closer review. Regions supported by only one tool can still be useful, but they should be interpreted carefully.
 
-Genome mining results should be interpreted together with assembly quality. A fragmented or incomplete assembly can split biosynthetic gene clusters across contigs or cause candidate regions to be missed.
+## Combined BGC Summary
 
-Output folder:
-
-```text
-02_QUAST_QC/
-```
-
-## Step 4: Bakta Genome Annotation
-
-Bakta annotates the bacterial genome and produces standardized gene feature files. These annotations help interpret candidate biosynthetic regions by showing nearby coding sequences, RNA features, and functional predictions.
-
-Output folder:
-
-```text
-03_Bakta_Annotation/
-```
-
-The user must provide the local Bakta database path in `config.env`.
-
-## Step 5: antiSMASH Biosynthetic Gene Cluster Detection
-
-antiSMASH detects biosynthetic gene clusters using rule-based methods and curated knowledge of known BGC classes. It produces a detailed HTML report and region files that are useful for manual review.
-
-Output folder:
-
-```text
-04_AntiSMASH_BGC/
-```
-
-antiSMASH is especially useful when the genome contains recognizable BGC classes or gene arrangements similar to known biosynthetic systems.
-
-## Step 6: GECCO Machine-Learning BGC Prediction
-
-GECCO predicts candidate biosynthetic gene clusters using machine-learning methods. It produces cluster, feature, and gene tables that can be reviewed alongside antiSMASH results.
-
-Output folder:
-
-```text
-05_GECCO_ML/
-```
-
-GECCO can identify candidates using a different strategy from antiSMASH, which makes it useful as a complementary genome mining tool.
-
-## Why antiSMASH and GECCO Are Complementary
-
-antiSMASH and GECCO approach BGC detection differently.
-
-antiSMASH is rule-based and knowledge-driven. It is strong for known biosynthetic classes and produces detailed region diagrams and annotations.
-
-GECCO is machine-learning based. It can provide candidate regions based on learned sequence patterns and probabilities.
-
-Using both tools gives the user two independent views of potential biosynthetic regions. Candidates supported by both tools, or candidates with strong evidence in one tool and good annotation context, are useful targets for manual review.
-
-## Step 7: Combined BGC Summary Table
-
-The pipeline creates a combined summary table from antiSMASH region files and GECCO cluster predictions.
-
-Output files:
+The pipeline creates combined summary files:
 
 ```text
 06_Combined_Results/combined_bgc_summary.tsv
 06_Combined_Results/combined_bgc_summary.txt
 ```
 
-The TSV table is designed as a first-pass index of predicted regions. It does not replace manual review of the original antiSMASH and GECCO outputs.
+These files provide a first-pass index of predicted BGC evidence. They do not replace manual review of the full antiSMASH and GECCO outputs.
 
-## Step 8: Final Genome Mining Interpretation Report
+## Final Report
 
-The pipeline writes a final interpretation report that summarizes the major output locations, counts candidate records, and gives a practical manual review checklist.
+The final report summarizes:
 
-Output file:
+- input genome information
+- major output locations
+- antiSMASH evidence
+- GECCO evidence
+- combined candidate BGC records
+- practical interpretation notes
 
-```text
-07_Final_Report/genome_mining_interpretation_report.txt
-```
+The report is meant to help a student or reviewer understand where to start when reviewing genome mining results.
 
-The final summary is written separately:
+## Why config.env Matters
 
-```text
-07_Final_Report/genome_mining_summary.txt
-```
-
-## Reusable Configuration
-
-The user creates `config.env` from:
-
-```bash
-cp config.example.env ./config.env
-```
-
-Important settings:
+The workflow is reusable because project-specific settings are stored in `config.env`:
 
 ```text
 PROJECT_DIR
@@ -193,40 +89,32 @@ THREADS
 BAKTA_DB
 ```
 
-`PROJECT_DIR` is the analysis project folder.
+The public `config.example.env` shows the required variables. The private `config.env` contains local paths and is ignored by Git.
 
-`GENOME_FASTA` points to the project-local FASTA file inside `PROJECT_DIR/01_Genome_FASTA`.
+## Safety Design
 
-## Conda Environment
+The pipeline protects the input genome FASTA by requiring it to be inside `PROJECT_DIR/01_Genome_FASTA`. Generated output folders may be replaced during reruns, but the input folder is not deleted.
 
-The software environment is documented in `environment.yml`.
+The script also validates the sample name before using it in file and folder names.
 
-Create the environment when needed:
+## What the Results Mean
 
-```bash
-conda env create -f environment.yml
-```
+The pipeline identifies predicted candidate BGC regions and organizes evidence from multiple tools.
 
-Activate it before running the pipeline:
+It does not prove:
 
-```bash
-conda activate CortexAI
-```
+- compound production
+- biological activity
+- pathogenicity
+- clinical relevance
+- experimental discovery
 
-The pipeline does not create or modify Conda environments automatically.
+Those conclusions require additional analysis, expert review, and experimental validation.
 
-## Reproducibility
+## Future Directions
 
-This pipeline supports reproducibility because:
+Future versions could add comparative BGC analysis, MIBiG similarity summaries, metabolite-family prioritization, richer visualization, or a separate DeepBGC exploration module.
 
-- Template files stay in `00_Pipeline_Templates`.
-- Each analysis project lives in `09_Projects`.
-- Input FASTA files are stored inside each project.
-- Downstream outputs are generated inside each project.
-- Project-specific settings are stored in `config.env`.
-- Required tools are listed in `environment.yml`.
-- Final reports are written in `07_Final_Report`.
+## Portfolio Value
 
-## Final Statement
-
-This project provides a reusable genome mining workflow for assembled bacterial genomes. It is designed for consistent project setup, clean template reuse, clear output organization, and practical downstream interpretation of antiSMASH and GECCO candidate biosynthetic gene clusters.
+This project demonstrates assembled-genome analysis, genome mining, machine-learning-supported candidate prediction, reproducible configuration, and careful interpretation of computational evidence.

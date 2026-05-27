@@ -2,8 +2,9 @@ name: CortexAI
 channels:
   - conda-forge
   - bioconda
+  - defaults
 dependencies:
-  - python
+  - python=3.11
   - quast
   - bakta
   - antismash
