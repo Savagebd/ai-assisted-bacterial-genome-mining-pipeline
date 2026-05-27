@@ -1,7 +1,8 @@
-# Machine-Learning-Supported Bacterial Genome Mining Pipeline
+# AI-Assisted Bacterial Genome Mining Pipeline
 
-Reusable genome mining workflow for assembled bacterial genomes using QUAST, Bakta, antiSMASH, GECCO, and candidate biosynthetic gene cluster reporting.
+Reusable genome mining workflow for assembled bacterial genomes using QUAST, Bakta, antiSMASH, GECCO machine-learning BGC prediction, and candidate biosynthetic gene cluster reporting.
 
+The term “AI-assisted” refers to machine-learning-supported BGC prediction and automated candidate reporting within the workflow. Results should be interpreted as computational candidates for manual review, not as experimental proof of compound production or biological activity.
 
 ## What This Pipeline Does
 
