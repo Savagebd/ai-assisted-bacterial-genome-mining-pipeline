@@ -224,7 +224,7 @@ Possible future additions include:
 - better HTML or Markdown final reporting
 - comparative genome mining across multiple bacterial genomes
 
-## Portfolio / Faculty Value
+## Skills Demonstrated
 
 This project demonstrates genome mining from assembled bacterial genomes, practical use of annotation and BGC prediction tools, safe project organization, reproducible configuration, and careful candidate-level interpretation. It fits between a foundational bacterial genome analysis pipeline and more advanced comparative or organism-specific genome mining workflows.
 

@@ -115,6 +115,6 @@ Those conclusions require additional analysis, expert review, and experimental v
 
 Future versions could add comparative BGC analysis, MIBiG similarity summaries, metabolite-family prioritization, richer visualization, or a separate DeepBGC exploration module.
 
-## Portfolio Value
+## Skills Demonstrated
 
 This project demonstrates assembled-genome analysis, genome mining, machine-learning-supported candidate prediction, reproducible configuration, and careful interpretation of computational evidence.
