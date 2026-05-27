@@ -2,7 +2,6 @@
 
 Reusable genome mining workflow for assembled bacterial genomes using QUAST, Bakta, antiSMASH, GECCO, and candidate biosynthetic gene cluster reporting.
 
-This repository is part of a bioinformatics portfolio by Raihanul Islam (`Savagebd`). It is designed as a practical, reproducible template for bacterial genome mining projects that begin with an assembled genome FASTA file.
 
 ## What This Pipeline Does
 
